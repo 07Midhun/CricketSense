@@ -1,0 +1,12 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h2>Predict Runs</h2>
+<form method="post">
+  <input type="number" step="0.1" name="overs" placeholder="Overs Played" required>
+  <button type="submit">Predict</button>
+</form>
+{% if result %}
+<h3>Predicted Runs: {{ result }}</h3>
+{% endif %}
+{% endblock %}
