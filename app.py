@@ -1,30 +1,49 @@
-
-from flask import Flask, render_template, request
+from flask import Flask, render_template, jsonify
+import pandas as pd
 
 app = Flask(__name__)
 
-def predict_runs(overs):
-    return int(overs * 7.5)
+# Load lightweight CSV data (already updated by you)
+MATCH_CSV = "data/match_summary.csv"
+OVER_CSV = "data/over_summary.csv"
+
+matches_df = pd.read_csv(MATCH_CSV)
+overs_df = pd.read_csv(OVER_CSV)
 
 @app.route("/")
-def index():
-    return render_template("index.html")
+def dashboard():
+    # send match list to dropdown
+    match_list = matches_df[["match_id", "team1", "team2"]].to_dict(orient="records")
+    return render_template("dashboard.html", matches=match_list)
 
-@app.route("/predict", methods=["GET", "POST"])
-def predict():
-    result = None
-    if request.method == "POST":
-        overs = float(request.form["overs"])
-        result = predict_runs(overs)
-    return render_template("predict.html", result=result)
+@app.route("/match/<int:match_id>")
+def match_analysis(match_id):
+    # Match summary
+    match = matches_df[matches_df["match_id"] == match_id].iloc[0]
 
-@app.route("/analysis")
-def analysis():
-    return render_template("analysis.html")
+    # Over-wise data
+    over_data = overs_df[overs_df["match_id"] == match_id]
 
-@app.route("/about")
-def about():
-    return render_template("about.html")
+    runs_by_over = over_data.groupby("over")["runs"].sum().cumsum().tolist()
+    overs = over_data["over"].unique().tolist()
+
+    # Phase-wise stats
+    powerplay = over_data[over_data["over"] <= 6]["runs"].sum()
+    middle = over_data[(over_data["over"] > 6) & (over_data["over"] <= 15)]["runs"].sum()
+    death = over_data[over_data["over"] > 15]["runs"].sum()
+
+    return jsonify({
+        "teams": f"{match['team1']} vs {match['team2']}",
+        "venue": match["venue"],
+        "winner": match["winner"],
+        "overs": overs,
+        "runs": runs_by_over,
+        "phases": {
+            "powerplay": int(powerplay),
+            "middle": int(middle),
+            "death": int(death)
+        }
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
