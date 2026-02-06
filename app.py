@@ -8,10 +8,10 @@ overs_df = pd.read_csv("data/over_summary.csv")
 
 TEAM_COLS = [c for c in matches_df.columns if "team" in c.lower()]
 
-# ---------------- HOME ----------------
 @app.route("/")
 def home():
     return render_template("home.html")
+
 
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
