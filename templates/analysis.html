@@ -1,20 +1,61 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Match Analysis</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
 
-<nav class="navbar">
-    <h1>📊 Match Analysis</h1>
-    <a href="/">⬅ Back</a>
-</nav>
+<h1>📺 Match Analysis Studio</h1>
+<p>Select a match to view run progression and performance analysis.</p>
 
-<section class="hero">
-    <h2>Match Analysis</h2>
-    <p>Select a match and explore performance insights</p>
-</section>
+<div class="card">
+    <h2>🗂 Available Matches</h2>
+    <ul>
+        {% for m in matches %}
+        <li>
+            <a href="#" style="color:#4da3ff;" onclick="loadMatch({{ m.match_id }})">
+                {{ m.teams }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 
-</body>
-</html>
+<div class="card">
+    <h2 id="matchTitle">📈 Run Progression</h2>
+    <canvas id="chart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let chart;
+
+function loadMatch(id) {
+    fetch(`/analysis/${id}`)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("matchTitle").innerText =
+            "📈 " + data.teams + " – Run Progression";
+
+        if (chart) chart.destroy();
+
+        chart = new Chart(document.getElementById("chart"), {
+            type: "line",
+            data: {
+                labels: data.overs,
+                datasets: [{
+                    label: "Cumulative Runs",
+                    data: data.runs,
+                    borderColor: "#4da3ff",
+                    borderWidth: 3,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: "Overs" } },
+                    y: { title: { display: true, text: "Runs" } }
+                }
+            }
+        });
+    });
+}
+</script>
+
+{% endblock %}

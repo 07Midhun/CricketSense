@@ -1,19 +1,53 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>CricketSense</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #071a2f, #0b2d4d);
+            color: #ffffff;
+        }
+        nav {
+            padding: 15px 30px;
+            background: #000000;
+        }
+        nav a {
+            color: #4da3ff;
+            margin-right: 25px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #ffffff;
+        }
+        .container {
+            padding: 40px;
+        }
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            margin-top: 0;
+        }
+    </style>
 </head>
 <body>
+
 <nav>
-  <a href="/">Home</a>
-  <a href="/predict">Predict</a>
-  <a href="/analysis">Analysis</a>
-  <a href="/about">About</a>
+    <a href="/">Home</a>
+    <a href="/predict">Predict</a>
+    <a href="/analysis">Analysis</a>
+    <a href="/about">About</a>
 </nav>
+
 <div class="container">
-{% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 </div>
+
 </body>
 </html>
